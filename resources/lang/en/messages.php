@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'main' => 'Main',
+    'login' => 'Login',
+    'register' => 'Register',
+    'logout' => 'Logout',
+    'hello' => 'Hello, ',
+    'create_button' => 'Create post',
+    'nickname' => 'Nick name',
+    'password' => 'Password',
+    'first_name' => 'First Name',
+    'last_name' => 'Last name',
+    'email' => 'Email',
+    'male' => 'male',
+    'female' => 'female',
+    'edit' => 'Edit',
+    'title' => 'Title',
+    'content' => 'Content',
+    'image' => 'Image',
+    'first_image' => 'First image',
+    'second_image' => 'Second image',
+    'third_image' => 'Third image',
+    'delete' => 'Delete',
+    'back' => 'Back',
+    '403_title' => 'Access denied',
+    '403_content' => 'Only admin can delete the post',
+];
