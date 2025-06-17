@@ -7,11 +7,15 @@ use App\Http\Requests\StoreUserPostRequest;
 use App\Http\Requests\UpdateUserPostRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Services\PostImageService;
 
 
 class UserPostController extends Controller{
+
+    public function __construct(private PostImageService $images) {}
+
     public function index(){
-        $userPosts = UserPost::orderBy('id', 'asc')->get();
+        $userPosts = UserPost::latest('id')->get();
         return view('userPost.index', compact('userPosts'));
     }
 
@@ -21,24 +25,15 @@ class UserPostController extends Controller{
 
     public function store(StoreUserPostRequest $request)
     {
-        $data = $request->validated();
-        if (!$request->hasFile('image_file')) {
-            return back()
-                ->withErrors(['image_file' => 'Выберите изображение'])
-                ->withInput();
-        }
+        $path = $this->images->store($request->file('image_file'));
 
-        $file = $request->file('image_file');
-        $timestamp = Carbon::now()->format('Ymd_His');
-        $ext = $file->getClientOriginalExtension();
-        $filename = $timestamp . '.' . $ext;
-        $path = $file->storeAs('posts', $filename, 'public');
+        UserPost::create([
+            ...$request->safe()->except('image_file'),
+            'user_id'    => Auth::id(),
+            'image_link' => $path,
+        ]);
 
-        $data['user_id'] = Auth::id();
-        $data['image_link'] = $path;
-        UserPost::create($data);
-
-        return redirect()->route('userPost.index');
+        return to_route('userPost.index');
     }
 
     public function show(UserPost $userPost){
@@ -51,33 +46,25 @@ class UserPostController extends Controller{
 
     public function update(UpdateUserPostRequest $request, UserPost $userPost)
     {
-        $data = $request->validated();
+        $update = $request->safe()->except('image_file');
 
         if ($request->hasFile('image_file')) {
-            if ($userPost->image_link) {
-                Storage::disk('public')->delete($userPost->image_link);
-            }
-
-            $timestamp = Carbon::now()->format('Ymd_His');
-            $ext = $request->file('image_file')->getClientOriginalExtension();
-            $filename = $timestamp . '.' . $ext;
-
-            $path = $request->file('image_file')->storeAs('posts', $filename, 'public');
-            $data['image_link'] = $path;
+            $update['image_link'] = $this->images->replace(
+                $request->file('image_file'),
+                $userPost->image_link
+            );
         }
 
-        $userPost->update($data);
+        $userPost->update($update);
 
-        return redirect()
-            ->route('userPost.index')
-            ->with('success', 'Post updated');
+        return to_route('userPost.index')->with('success', 'Post updated');
     }
 
-    public function destroy(UserPost $userPost){
-        if ($userPost->image_link) {
-            Storage::disk('public')->delete($userPost->image_link);
-        }
+    public function destroy(UserPost $userPost)
+    {
+        $this->images->delete($userPost->image_link);
         $userPost->delete();
+
         return redirect()->route('userPost.index');
     }
 }
