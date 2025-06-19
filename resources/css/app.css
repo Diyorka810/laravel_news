@@ -11,3 +11,59 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+#imagePreview {
+    max-width: 200px;
+    margin-top: 10px;
+    display: none;
+    cursor: pointer;
+}
+
+#imgOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(0, 0, 0, .8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#imgOverlay img {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.post-card {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    position: relative;
+}
+
+.post-thumbnail {
+    height: 250px;
+    object-fit: cover;
+}
+
+.edit-btn {
+    width: 25%;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+}
+
+.edit-btn-placeholder {
+    height: 32px;
+}
+
+.post-banner {
+    position: relative;
+    height: 80vh;
+    overflow: hidden;
+}
+
+.post-banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
