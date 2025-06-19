@@ -15,7 +15,10 @@ class UserPostController extends Controller{
     public function __construct(private PostImageService $images) {}
 
     public function index(){
-        $userPosts = UserPost::latest('id')->get();
+        $lang = app()->getLocale();
+
+        $userPosts = UserPost::with('translations')->latest('id')->get();
+
         return view('userPost.index', compact('userPosts'));
     }
 
@@ -27,35 +30,49 @@ class UserPostController extends Controller{
     {
         $path = $this->images->store($request->file('image_file'));
 
-        UserPost::create([
-            ...$request->safe()->except('image_file'),
-            'user_id'    => Auth::id(),
-            'image_link' => $path,
+        $post = UserPost::create([
+            'user_id'     => Auth::id(),
+            'image_link'  => $path,
+            'is_published'=> true,
         ]);
 
-        return to_route('userPost.index');
+        $post->translations()->create([
+            'language' => $request->input('language'),
+            'title'    => $request->input('title'),
+            'content'  => $request->input('content'),
+        ]);
+
+        return to_route('userPost.index')->with('success', 'Post created');
     }
 
     public function show(UserPost $userPost){
-        return view('userPost.show', compact('userPost'));
+        $translation = $userPost->translation();
+        return view('userPost.show', compact('userPost', 'translation'));
     }
 
     public function edit(UserPost $userPost){
-        return view('userPost.edit', compact('userPost'));
+        $translation = $userPost->translation(request('lang'));
+        return view('userPost.edit', compact('userPost', 'translation'));
     }
 
     public function update(UpdateUserPostRequest $request, UserPost $userPost)
     {
-        $update = $request->safe()->except('image_file');
-
         if ($request->hasFile('image_file')) {
-            $update['image_link'] = $this->images->replace(
+            $userPost->image_link = $this->images->replace(
                 $request->file('image_file'),
                 $userPost->image_link
             );
         }
 
-        $userPost->update($update);
+        $userPost->translations()->updateOrCreate(
+            ['language' => $request->input('language')],
+            [
+                'title'   => $request->input('title'),
+                'content' => $request->input('content'),
+            ]
+        );
+
+        $userPost->save();
 
         return to_route('userPost.index')->with('success', 'Post updated');
     }
@@ -65,6 +82,6 @@ class UserPostController extends Controller{
         $this->images->delete($userPost->image_link);
         $userPost->delete();
 
-        return redirect()->route('userPost.index');
+        return to_route('userPost.index')->with('success', 'Post deleted');
     }
 }

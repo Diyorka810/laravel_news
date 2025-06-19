@@ -5,6 +5,7 @@ return [
     'login' => 'Вход',
     'register' => 'Регистрация',
     'logout' => 'Выйти',
+    'language' => 'Язык',
     'hello' => 'Привет, ',
     'create_button' => 'Создать пост',
     'nickname' => 'Имя пользователя',
