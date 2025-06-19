@@ -2,10 +2,7 @@
 
 @section('content')
     <div class="position-relative" style="height: 80vh; overflow: hidden;">
-        <img src="{{ asset('storage/' . $userPost->image_link) }}"
-             alt="{{ $userPost->image_link }}"
-             class="w-100 h-100"
-             style="object-fit: cover;">
+        <img src="{{ asset('storage/' . $userPost->image_link) }}" alt="{{ $userPost->image_link }}" class="w-100 h-100" style="object-fit: cover;">
     </div>
 
     <div class="mt-3">

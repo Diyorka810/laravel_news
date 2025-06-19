@@ -66,19 +66,16 @@
             const overlay   = document.getElementById('imgOverlay');
             const overlayImg= document.getElementById('overlayImg');
 
-            // превью уже есть (покажется после выбора файла) — ловим клик
             preview?.addEventListener('click', () => {
-                // если превью ещё скрыто — не разворачиваем
                 if (preview.style.display === 'none') return;
 
-                overlayImg.src = preview.src;  // кидаем ту же картинку
+                overlayImg.src = preview.src;ч
                 overlay.style.display = 'flex';
             });
 
-            // клик по затемнённому фону — закрыть
             overlay?.addEventListener('click', () => {
                 overlay.style.display = 'none';
-                overlayImg.src = '';           // чистим, чтобы не держать в памяти
+                overlayImg.src = '';
             });
         })();
     </script>
