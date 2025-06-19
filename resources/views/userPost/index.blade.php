@@ -7,8 +7,8 @@
             <div class="post border p-2 h-100 d-flex flex-column justify-content-between" style="word-break: break-word; overflow-wrap: break-word; position: relative;">
                 <a href="{{ route('userPost.show', $userPost) }}" class="text-decoration-none text-dark d-block">
                     <img src="{{ asset('storage/' . $userPost->image_link) }}" class="card-img" alt="{{ $userPost->image_link }}" style="height: 250px; object-fit: cover;">
-                    <h2 class="h5">{{ \Illuminate\Support\Str::limit($userPost->title, 50) }}</h2>
-                    <p>{{ \Illuminate\Support\Str::limit($userPost->content, 140) }}</p>
+                    <h2 class="h5">{{ \Illuminate\Support\Str::limit($userPost->translation()?->title ?? '—', 50) }}</h2>
+                    <p>{{ \Illuminate\Support\Str::limit($userPost->translation()?->content ?? '—', 140) }}</p>
                 </a>
 
                 @if (auth()->check() && (auth()->id() === $userPost->user_id || auth()->user()->is_admin))

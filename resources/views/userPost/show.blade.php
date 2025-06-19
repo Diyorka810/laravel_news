@@ -6,8 +6,8 @@
     </div>
 
     <div class="mt-3">
-        <h2>{{ $userPost->title }}</h2>
-        <p>{{ $userPost->content }}</p>
+        <h2>{{ $userPost->translation()?->title ?? '—' }}</h2>
+        <p>{{ $userPost->translation()?->content ?? '—' }}</p>
     </div>
 
     <div class="mt-3">
