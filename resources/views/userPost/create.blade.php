@@ -2,13 +2,22 @@
 
 @section('content')
 <div>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ route('userPost.store') }}" method="post" enctype="multipart/form-data">
         @csrf
 
-        {{-- язык --}}
         <div class="mb-3">
             <label for="language" class="form-label">{{ __('messages.language') }}</label>
-            <select name="language" id="language" class="form-select" required>
+            <select name="language" id="language" class="form-select" >
                 @foreach (config('app.locales') as $code => $label)
                     <option value="{{ $code }}" {{ app()->getLocale() === $code ? 'selected' : '' }}>
                         {{ $label }}
@@ -17,39 +26,43 @@
             </select>
         </div>
 
-        {{-- заголовок --}}
         <div class="mb-3">
             <label for="title" class="form-label">{{ __('messages.title') }}</label>
             <input type="text"
                    name="title"
                    id="title"
-                   class="form-control"
+                   class="form-control @error('title') is-invalid @enderror"
                    placeholder="{{ __('messages.title') }}"
-                   required>
+                   >
+            @error('title')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        {{-- контент --}}
         <div class="mb-3">
             <label for="content" class="form-label">{{ __('messages.content') }}</label>
             <textarea name="content"
                       id="content"
-                      class="form-control"
+                      class="form-control @error('content') is-invalid @enderror"
                       placeholder="{{ __('messages.content') }}"
-                      required></textarea>
+                      ></textarea>
+            @error('content')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        {{-- изображение --}}
         <div class="mb-3">
             <label for="image_file" class="form-label">{{ __('messages.image') }}</label>
             <input type="file"
                    name="image_file"
                    id="image_file"
-                   class="form-control"
+                   class="form-control @error('image_file') is-invalid @enderror"
                    accept="image/*"
-                   required>
-
-            {{-- превью и оверлей --}}
-            <img id="imagePreview" src="{{ asset('images/first_post.jpeg') }}" alt="">
+                   >
+            @error('image_file')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+            <img id="imagePreview" src="" alt="">
             <div id="imgOverlay">
                 <img id="overlayImg">
             </div>

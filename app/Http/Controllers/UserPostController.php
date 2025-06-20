@@ -28,7 +28,10 @@ class UserPostController extends Controller{
 
     public function store(StoreUserPostRequest $request)
     {
-        $path = $this->images->store($request->file('image_file'));
+        $data = $request->validated();
+
+        $path = $this->images->store($data['image_file']);
+        unset($data['image_file']);
 
         $post = UserPost::create([
             'user_id'     => Auth::id(),
@@ -37,12 +40,12 @@ class UserPostController extends Controller{
         ]);
 
         $post->translations()->create([
-            'language' => $request->input('language'),
-            'title'    => $request->input('title'),
-            'content'  => $request->input('content'),
+            'language' => $data['language'],
+            'title'    => $data['title'],
+            'content'  => $data['content'],
         ]);
 
-        return to_route('userPost.index')->with('success', 'Post created');
+        return to_route('userPost.index')->with('success', __('messages.post_created'));
     }
 
     public function show(UserPost $userPost){
@@ -74,7 +77,7 @@ class UserPostController extends Controller{
 
         $userPost->save();
 
-        return to_route('userPost.index')->with('success', 'Post updated');
+        return to_route('userPost.index')->with('success', __('messages.post_created'));
     }
 
     public function destroy(UserPost $userPost)
