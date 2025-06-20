@@ -17,6 +17,16 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
+                    <li>
+                        <form method="GET" action="{{ route('userPost.index') }}" class="d-flex me-2" role="search">
+                            <input type="search"
+                                name="q"
+                                value="{{ request('q') }}"
+                                class="form-control form-control-sm"
+                                placeholder="{{ __('messages.search_placeholder') }}">
+                        </form>
+                    </li>
+
                     <li><a class="nav-link" href="{{ route('lang.switch', 'en') }}">EN</a></li>
                     <li><a class="nav-link" href="{{ route('lang.switch', 'ru') }}">RU</a></li>
 

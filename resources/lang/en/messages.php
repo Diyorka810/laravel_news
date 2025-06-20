@@ -28,4 +28,5 @@ return [
     '403_content' => 'Only admin can delete the post',
     'choose_category' => 'Choose category',
     'category' => 'Сategory',
+    'search_placeholder' => 'Search by title and description...',
 ];
