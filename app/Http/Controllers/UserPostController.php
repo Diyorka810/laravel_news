@@ -16,6 +16,8 @@ class UserPostController extends Controller{
 
     public function index(Request $request){
         $categoryId = $request->input('category');
+        $search = $request->input('q');
+
         $query = UserPost::with('translations');
 
         if ($categoryId) {
@@ -26,10 +28,17 @@ class UserPostController extends Controller{
             $query->whereIn('category_id', $ids);
         }
 
+        if ($search) {
+            $query->whereHas('translations', function ($q) use ($search) {
+                $q->where('title',   'ILIKE', "%{$search}%")
+                  ->orWhere('content','ILIKE', "%{$search}%");
+            });
+        }
+
         $userPosts = $query->latest('id')->get();
         $categories = Category::all();
 
-        return view('userPost.index', compact('userPosts', 'categories', 'categoryId'));
+        return view('userPost.index', compact('userPosts', 'categories', 'categoryId', 'search'));
     }
 
     public function create()
