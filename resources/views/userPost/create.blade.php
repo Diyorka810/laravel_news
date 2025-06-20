@@ -27,6 +27,21 @@
         </div>
 
         <div class="mb-3">
+            <label for="category_id" class="form-label">{{ __('messages.category') }}</label>
+            <select name="category_id" id="category_id" class="form-select @error('category_id') is-invalid @enderror">
+                <option value="">{{ __('messages.choose_category') }}</option>
+                @foreach ($categories as $cat)
+                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
+                        {{ $cat->parent_id ? '— ' : '' }}{{ $cat->name }}
+                    </option>
+                @endforeach
+            </select>
+            @error('category_id')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
             <label for="title" class="form-label">{{ __('messages.title') }}</label>
             <input type="text"
                    name="title"

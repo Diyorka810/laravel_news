@@ -17,6 +17,7 @@ class StoreUserPostRequest extends FormRequest
             'language' => ['required', 'string', 'size:2'],
             'title' => 'required|string',
             'content' => 'required|string',
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
             'image_link' => 'nullable|string',
             'image_file'  => ['required', 'image'],
         ];

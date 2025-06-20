@@ -7,11 +7,10 @@
             <select name="category"
                     class="form-select"
                     onchange="this.form.submit()">
-                <option value="">{{ __('messages.all_categories') }}</option>
+                <option value="">{{ __('messages.choose_category') }}</option>
                 @foreach ($categories as $cat)
-                    <option value="{{ $cat->id }}"
-                            {{ $categoryId == $cat->id ? 'selected' : '' }}>
-                        {{ $cat->name }}
+                    <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
+                        {{ $cat->parent_id ? '— ' : '' }}{{ $cat->name }}
                     </option>
                 @endforeach
             </select>
