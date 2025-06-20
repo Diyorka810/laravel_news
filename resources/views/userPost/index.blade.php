@@ -1,6 +1,24 @@
 @extends('layouts.main')
 
 @section('content')
+<div class="row mt-3">
+    <div class="col-md-4 col-sm-6">
+        <form method="GET" action="{{ route('userPost.index') }}">
+            <select name="category"
+                    class="form-select"
+                    onchange="this.form.submit()">
+                <option value="">{{ __('messages.all_categories') }}</option>
+                @foreach ($categories as $cat)
+                    <option value="{{ $cat->id }}"
+                            {{ $categoryId == $cat->id ? 'selected' : '' }}>
+                        {{ $cat->name }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+</div>
+
 <div class="row g-3 mt-3">
     @foreach ($userPosts as $userPost)
         <div class="col-12 col-sm-6 col-md-4">

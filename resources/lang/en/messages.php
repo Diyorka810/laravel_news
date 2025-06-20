@@ -26,4 +26,5 @@ return [
     'back' => 'Back',
     '403_title' => 'Access denied',
     '403_content' => 'Only admin can delete the post',
+    'all_categories' => 'Choose category',
 ];
