@@ -10,6 +10,7 @@ class UserPost extends Model
 
     protected $fillable = [
         'user_id',
+        'category_id',
         'image_link',
         'is_published',
     ];
@@ -30,5 +31,10 @@ class UserPost extends Model
 
         return $this->translations->firstWhere('language', $lang)
             ?? $this->translations->first();
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

@@ -5,8 +5,6 @@ use App\Models\UserPost;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreUserPostRequest;
 use App\Http\Requests\UpdateUserPostRequest;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
 use App\Services\PostImageService;
 
 
