@@ -68,17 +68,23 @@ class UserPostController extends Controller{
 
     public function edit(UserPost $userPost){
         $translation = $userPost->translation(request('lang'));
-        return view('userPost.edit', compact('userPost', 'translation'));
+        $categories = Category::all();
+
+        return view('userPost.edit', compact('userPost', 'translation', 'categories'));
     }
 
     public function update(UpdateUserPostRequest $request, UserPost $userPost)
     {
+        $data = $request->validated();
+
         if ($request->hasFile('image_file')) {
             $userPost->image_link = $this->images->replace(
                 $request->file('image_file'),
                 $userPost->image_link
             );
         }
+
+        $userPost->category_id = $data['category_id'];
 
         $userPost->translations()->updateOrCreate(
             ['language' => $request->input('language')],

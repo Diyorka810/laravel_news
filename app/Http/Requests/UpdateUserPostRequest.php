@@ -16,6 +16,7 @@ class UpdateUserPostRequest extends FormRequest
         return [
             'language' => ['required','string','size:2'],
             'title' => 'required|string',
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
             'content' => 'required|string',
             'image_link' => 'nullable|string',
         ];
