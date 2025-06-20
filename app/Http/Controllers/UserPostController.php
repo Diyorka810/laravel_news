@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\UserPost;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserPostRequest;
 use App\Http\Requests\UpdateUserPostRequest;
+use App\Models\UserPost;
+use App\Models\Category;
 use App\Services\PostImageService;
 
 
@@ -12,12 +14,22 @@ class UserPostController extends Controller{
 
     public function __construct(private PostImageService $images) {}
 
-    public function index(){
-        $lang = app()->getLocale();
+    public function index(Request $request){
+        $categoryId = $request->input('category');
+        $query = UserPost::with('translations');
 
-        $userPosts = UserPost::with('translations')->latest('id')->get();
+        if ($categoryId) {
+            $ids = Category::where('id', $categoryId)
+                       ->orWhere('parent_id', $categoryId)
+                       ->pluck('id');
 
-        return view('userPost.index', compact('userPosts'));
+            $query->whereIn('category_id', $ids);
+        }
+
+        $userPosts = $query->latest('id')->get();
+        $categories = Category::all();
+
+        return view('userPost.index', compact('userPosts', 'categories', 'categoryId'));
     }
 
     public function create(){
