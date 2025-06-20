@@ -32,8 +32,10 @@ class UserPostController extends Controller{
         return view('userPost.index', compact('userPosts', 'categories', 'categoryId'));
     }
 
-    public function create(){
-        return view('userPost.create');
+    public function create()
+    {
+        $categories = Category::all();
+        return view('userPost.create', compact('categories'));
     }
 
     public function store(StoreUserPostRequest $request)
@@ -45,6 +47,7 @@ class UserPostController extends Controller{
 
         $post = UserPost::create([
             'user_id'     => Auth::id(),
+            'category_id' => $data['category_id'],
             'image_link'  => $path,
             'is_published'=> true,
         ]);
