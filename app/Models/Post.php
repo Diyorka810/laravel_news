@@ -33,8 +33,8 @@ class Post extends Model
             ?? $this->translations->first();
     }
 
-    public function category()
+    public function categories()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class, 'post_categories');
     }
 }
