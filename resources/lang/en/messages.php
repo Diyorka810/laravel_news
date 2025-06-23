@@ -5,7 +5,7 @@ return [
     'login' => 'Login',
     'register' => 'Register',
     'logout' => 'Logout',
-    'language' => 'Language',
+    'locale' => 'Language',
     'hello' => 'Hello, ',
     'create_button' => 'Create post',
     'nickname' => 'Nick name',
