@@ -18,7 +18,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // возвращаем всё как было
         DB::statement('ALTER TABLE posts ADD COLUMN category_id BIGINT');
         DB::statement('ALTER TABLE posts ADD CONSTRAINT posts_category_id_foreign
                        FOREIGN KEY (category_id) REFERENCES categories(id)
