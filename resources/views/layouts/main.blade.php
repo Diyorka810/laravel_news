@@ -12,13 +12,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('userPost.index') }}">{{ __('messages.main') }}</a>
+                        <a class="nav-link" href="{{ route('post.index') }}">{{ __('messages.main') }}</a>
                     </li>
                 </ul>
 
                 <ul class="navbar-nav ms-auto">
                     <li>
-                        <form method="GET" action="{{ route('userPost.index') }}" class="d-flex me-2" role="search">
+                        <form method="GET" action="{{ route('post.index') }}" class="d-flex me-2" role="search">
                             <input type="search"
                                 name="q"
                                 value="{{ request('q') }}"
@@ -32,7 +32,7 @@
 
                     @auth
                         <li class="nav-item"><span class="nav-link">{{ __('messages.hello') }} {{ auth()->user()->user_name }}</span></li>
-                        <li><a class="nav-link" href="{{ route('userPost.create') }}">{{ __('messages.create_button') }}</a></li>
+                        <li><a class="nav-link" href="{{ route('post.create') }}">{{ __('messages.create_button') }}</a></li>
                         <li class="nav-item">
                             <form action="{{ route('user.logout') }}" method="POST">
                                 @csrf
