@@ -21,10 +21,10 @@ class PostController extends Controller{
         $query = Post::with('translations');
         if ($categoryId) {
             $ids = Category::where('id', $categoryId)
-                       ->orWhere('parent_id', $categoryId)
-                       ->pluck('id');
+                           ->orWhere('parent_id', $categoryId)
+                           ->pluck('id');
 
-            $query->whereIn('category_id', $ids);
+            $query->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $ids));
         }
 
         if ($search) {

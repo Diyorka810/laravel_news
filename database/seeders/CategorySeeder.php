@@ -9,7 +9,6 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        // корень IT
         $it = Category::create([
             'name' => 'IT',
             'slug' => 'it',
@@ -21,7 +20,6 @@ class CategorySeeder extends Seeder
             ['name' => 'Back-end',  'slug' => 'back'],
         ]);
 
-        // корень Design
         $design = Category::create([
             'name' => 'Design',
             'slug' => 'design',
@@ -33,7 +31,6 @@ class CategorySeeder extends Seeder
             ['name' => 'Graphic', 'slug' => 'graphic'],
         ]);
 
-        // корень Design
         $cars = Category::create([
             'name' => 'Cars',
             'slug' => 'cars',
