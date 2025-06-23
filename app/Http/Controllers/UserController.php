@@ -21,7 +21,7 @@ class UserController extends Controller
         $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
         Auth::login($user);
-        return redirect()->route('userPost.index');
+        return redirect()->route('post.index');
     }
 
     public function showLoginForm()
@@ -37,7 +37,7 @@ class UserController extends Controller
 
         if ($user && Hash::check($data['password'], $user->password)) {
             Auth::login($user);
-            return redirect()->route('userPost.index');
+            return redirect()->route('post.index');
         }
 
         return redirect()->back()->withErrors(['login' => 'Invalid credentials.']);
@@ -46,6 +46,6 @@ class UserController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect()->route('userPost.index');
+        return redirect()->route('post.index');
     }
 }
