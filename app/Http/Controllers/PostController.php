@@ -58,7 +58,7 @@ class PostController extends Controller{
         ]);
 
         $post->translations()->create([
-            'language' => $data['language'],
+            'locale' => $data['locale'],
             'title'    => $data['title'],
             'content'  => $data['content'],
         ]);
@@ -92,7 +92,7 @@ class PostController extends Controller{
         $post->category_id = $data['category_id'];
 
         $post->translations()->updateOrCreate(
-            ['language' => $request->input('language')],
+            ['locale' => $request->input('locale')],
             [
                 'title'   => $request->input('title'),
                 'content' => $request->input('content'),

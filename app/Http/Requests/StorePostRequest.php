@@ -14,7 +14,7 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'language' => ['required', 'string', 'size:2'],
+            'locale' => ['required', 'string', 'size:2'],
             'title' => 'required|string',
             'content' => 'required|string',
             'category_id' => ['required', 'integer', 'exists:categories,id'],

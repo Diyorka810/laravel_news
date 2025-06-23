@@ -16,8 +16,8 @@
         @csrf
 
         <div class="mb-3">
-            <label for="language" class="form-label">{{ __('messages.language') }}</label>
-            <select name="language" id="language" class="form-select" >
+            <label for="locale" class="form-label">{{ __('messages.locale') }}</label>
+            <select name="locale" id="locale" class="form-select" >
                 @foreach (config('app.locales') as $code => $label)
                     <option value="{{ $code }}" {{ app()->getLocale() === $code ? 'selected' : '' }}>
                         {{ $label }}

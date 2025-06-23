@@ -25,11 +25,11 @@ class Post extends Model
         return $this->hasMany(PostTranslation::class);
     }
 
-    public function translation(string $lang = null): ?PostTranslation
+    public function translation(): ?PostTranslation
     {
         $lang = $lang ?? app()->getLocale();
 
-        return $this->translations->firstWhere('language', $lang)
+        return $this->translations->firstWhere('locale', $lang)
             ?? $this->translations->first();
     }
 

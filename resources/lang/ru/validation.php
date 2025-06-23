@@ -12,7 +12,7 @@ return [
 'attributes' => [
     'title'      => __('messages.title'),
     'content'    => __('messages.content'),
-    'language'   => __('messages.language'),
+    'locale'   => __('messages.locale'),
     'image_file' => __('messages.image'),
 ],
 

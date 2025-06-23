@@ -18,8 +18,8 @@
         @method('PUT')
 
         <div class="mb-3">
-            <label for="language" class="form-label">{{ __('messages.language') }} <span class="text-danger">*</span></label>
-            <select name="language" id="language" class="form-select"
+            <label for="locale" class="form-label">{{ __('messages.locale') }} <span class="text-danger">*</span></label>
+            <select name="locale" id="locale" class="form-select"
                     onchange="location.href='{{ route('post.edit', $post->id) }}?lang=' + this.value;">
                 @foreach (config('app.locales') as $code => $label)
                     <option value="{{ $code }}" {{ request('lang', app()->getLocale()) === $code ? 'selected' : '' }}>
