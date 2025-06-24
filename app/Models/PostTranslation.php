@@ -16,10 +16,4 @@ class PostTranslation extends Model
     {
         return $this->belongsTo(Post::class, 'user_post_id');
     }
-
-    public function scopeSearch($q, string $text)
-    {
-        return $q->where('title',   'ILIKE', "%{$text}%")
-                 ->orWhere('content','ILIKE', "%{$text}%");
-    }
 }

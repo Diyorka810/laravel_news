@@ -23,4 +23,17 @@ class Category extends Model
     {
         return $this->belongsToMany(Post::class, 'post_categories');
     }
+
+    public function translations()
+    {
+        return $this->hasMany(CategoryTranslation::class);
+    }
+
+    public function translation(): ?CategoryTranslation
+    {
+        $lang = $lang ?? app()->getLocale();
+
+        return $this->translations->firstWhere('locale', $lang)
+            ?? $this->translations->first();
+    }
 }
