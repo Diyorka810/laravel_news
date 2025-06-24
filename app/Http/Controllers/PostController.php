@@ -8,33 +8,25 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\Category;
 use App\Services\PostImageService;
+use App\Filters\PostFilter;
 
 
 class PostController extends Controller{
 
     public function __construct(private PostImageService $images) {}
 
-    public function index(Request $request){
-        $categoryId = $request->input('category');
-        $search = $request->input('q');
+    public function index(Request $request)
+    {
+        $query = Post::query()->with('translations');
 
-        $query = Post::with('translations');
-        if ($categoryId) {
-            $ids = Category::where('id', $categoryId)
-                           ->orWhere('parent_id', $categoryId)
-                           ->pluck('id');
+        $posts = (new PostFilter($query, $request))
+            ->apply()
+            ->latest('id')
+            ->get();
 
-            $query->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $ids));
-        }
+        $categories = Category::with('translations')->get();
 
-        if ($search) {
-            $query->whereHas('translations', fn ($q) => $q->search($search));
-        }
-
-        $posts = $query->latest('id')->get();
-        $categories = Category::all();
-
-        return view('post.index', compact('posts', 'categories', 'categoryId', 'search'));
+        return view('post.index', compact('posts', 'categories'));
     }
 
     public function create()
@@ -52,10 +44,13 @@ class PostController extends Controller{
 
         $post = Post::create([
             'user_id'     => Auth::id(),
-            'category_id' => $data['category_id'],
             'image_link'  => $path,
             'is_published'=> true,
         ]);
+
+        $post->categories()->sync(
+            $this->collectAncestorIds($data['category_id'])
+        );
 
         $post->translations()->create([
             'locale' => $data['locale'],
@@ -89,7 +84,9 @@ class PostController extends Controller{
             );
         }
 
-        $post->category_id = $data['category_id'];
+        $post->categories()->sync(
+            $this->collectAncestorIds($data['category_id'])
+        );
 
         $post->translations()->updateOrCreate(
             ['locale' => $request->input('locale')],
@@ -110,5 +107,18 @@ class PostController extends Controller{
         $post->delete();
 
         return to_route('post.index')->with('success', 'Post deleted');
+    }
+
+    private function collectAncestorIds(int $categoryId): array
+    {
+        $ids = [];
+        $current = Category::find($categoryId);
+
+        while ($current) {
+            $ids[] = $current->id;
+            $current = $current->parent;
+        }
+
+        return $ids;
     }
 }
