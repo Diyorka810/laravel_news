@@ -37,14 +37,14 @@
                     </p>
                 </a>
 
-                @if (auth()->check() && (auth()->id() === $post->user_id || auth()->user()->is_admin))
-                    <a href="{{ route('post.edit', $post) }}"
-                       class="btn btn-sm btn-outline-secondary edit-btn">
-                        {{ __('messages.edit') }}
-                    </a>
-                @else
-                    <div class="edit-btn-placeholder"></div>
-                @endif
+                <div class="edit-btn-placeholder">
+                    @if (auth()->check() && (auth()->id() === $post->user_id || auth()->user()->is_admin))
+                        <a href="{{ route('post.edit', $post) }}"
+                        class="btn btn-sm btn-outline-secondary edit-btn">
+                            {{ __('messages.edit') }}
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     @endforeach
