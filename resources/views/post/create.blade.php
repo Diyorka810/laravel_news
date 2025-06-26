@@ -32,7 +32,7 @@
                 <option value="">{{ __('messages.choose_category') }}</option>
                 @foreach ($categories as $cat)
                     <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
-                        {{ $cat->parent_id ? '— ' : '' }}{{ $cat->name }}
+                        {{ $cat->parent_id ? '— ' : '' }}{{ $cat->translation()?->name }}
                     </option>
                 @endforeach
             </select>
@@ -48,6 +48,7 @@
                    id="title"
                    class="form-control @error('title') is-invalid @enderror"
                    placeholder="{{ __('messages.title') }}"
+                   value="{{ old('title') }}"
                    >
             @error('title')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -60,6 +61,7 @@
                       id="content"
                       class="form-control @error('content') is-invalid @enderror"
                       placeholder="{{ __('messages.content') }}"
+                      value="{{ old('content') }}"
                       ></textarea>
             @error('content')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -73,6 +75,7 @@
                    id="image_file"
                    class="form-control @error('image_file') is-invalid @enderror"
                    accept="image/*"
+                   value="{{ old('image_file') }}"
                    >
             @error('image_file')
                 <div class="invalid-feedback">{{ $message }}</div>

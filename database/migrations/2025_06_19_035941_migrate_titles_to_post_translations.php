@@ -13,7 +13,7 @@ return new class extends Migration
         DB::statement(
             "INSERT INTO post_translations
                 (user_post_id, language, title, content, created_at, updated_at)
-             SELECT id, 'ru', title, content, NOW(), NOW()
+             SELECT id, 'ru', title, content, datetime('now'), datetime('now')
              FROM user_posts
              WHERE title IS NOT NULL"
         );

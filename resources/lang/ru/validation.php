@@ -15,5 +15,13 @@ return [
     'locale'   => __('messages.locale'),
     'image_file' => __('messages.image'),
 ],
+'custom' => [
+        'user_name' => [
+            'unique' => __('messages.username_taken'),
+        ],
+        'email' => [
+            'unique' => __('messages.email_taken'),
+        ],
+    ],
 
 ];
