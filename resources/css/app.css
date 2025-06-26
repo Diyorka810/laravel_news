@@ -67,3 +67,11 @@
     height: 100%;
     object-fit: cover;
 }
+
+.pagination{
+    margin: 0 20px;
+}
+
+.pagination-container{
+    margin-bottom: 30px;
+}

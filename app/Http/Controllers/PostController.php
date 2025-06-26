@@ -22,7 +22,8 @@ class PostController extends Controller{
         $posts = (new PostFilter($query, $request))
             ->apply()
             ->latest('id')
-            ->get();
+            ->paginate(6)
+            ->withQueryString();
 
         $categories = Category::with('translations')->get();
 
