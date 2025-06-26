@@ -19,9 +19,16 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
-        $user = User::create($data);
-        Auth::login($user);
-        return redirect()->route('post.index');
+
+        try {
+            $user = User::create($data);
+            Auth::login($user);
+            return redirect()->route('post.index');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['register' => __('messages.register_failed')])
+                ->withInput();
+        }
     }
 
     public function showLoginForm()
@@ -40,7 +47,9 @@ class UserController extends Controller
             return redirect()->route('post.index');
         }
 
-        return redirect()->back()->withErrors(['login' => 'Invalid credentials.']);
+        return redirect()->back()
+            ->withErrors(['user_name' => __('messages.auth_failed')])
+            ->withInput();
     }
 
     public function logout()

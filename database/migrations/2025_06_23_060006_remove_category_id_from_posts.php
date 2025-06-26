@@ -10,7 +10,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('ALTER TABLE posts DROP COLUMN IF EXISTS category_id CASCADE');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE posts DROP COLUMN IF EXISTS category_id CASCADE');
+        } else {
+        }
     }
 
     /**
@@ -18,9 +21,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('ALTER TABLE posts ADD COLUMN category_id BIGINT');
-        DB::statement('ALTER TABLE posts ADD CONSTRAINT posts_category_id_foreign
-                       FOREIGN KEY (category_id) REFERENCES categories(id)
-                       ON DELETE CASCADE');
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement('ALTER TABLE posts ADD COLUMN category_id BIGINT');
+            DB::statement('ALTER TABLE posts ADD CONSTRAINT posts_category_id_foreign
+                           FOREIGN KEY (category_id) REFERENCES categories(id)
+                           ON DELETE CASCADE');
+        } else {
+        }
     }
 };

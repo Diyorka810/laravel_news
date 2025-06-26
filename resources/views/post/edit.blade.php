@@ -36,7 +36,7 @@
                 @foreach ($categories as $cat)
                     <option value="{{ $cat->id }}"
                         {{ old('category_id', $post->category_id) == $cat->id ? 'selected' : '' }}>
-                        {{ $cat->parent_id ? '— ' : '' }}{{ $cat->name }}
+                        {{ $cat->parent_id ? '— ' : '' }}{{ $cat->translation()?->name }}
                     </option>
                 @endforeach
             </select>
