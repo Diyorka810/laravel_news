@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Services\PostImageService;
 use App\Filters\PostFilter;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -146,8 +147,8 @@ class PostController extends Controller
     {
         DB::transaction(function () use ($post) {
             foreach ($post->images as $image) {
-                if ($image->name && \Illuminate\Support\Facades\Storage::disk('public')->exists($image->name)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($image->name);
+                if ($image->name && Storage::disk('public')->exists($image->name)) {
+                    Storage::disk('public')->delete($image->name);
                 }
             }
         });
