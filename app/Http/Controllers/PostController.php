@@ -9,8 +9,7 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Services\PostImageService;
 use App\Filters\PostFilter;
-use App\Models\PostImage;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -40,30 +39,30 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
+        $path = $this->images->store($request->file('image_file'));
+        unset($data['image_file']);
 
-        $path = $this->images->store($request->file('image_file')); // ✅
+        DB::transaction(function () use ($data, $path) {
+            $post = Post::create([
+                'user_id' => Auth::id(),
+                'is_published' => true,
+            ]);
 
-        unset($data['image_file']); // ✅
+            $post->images()->create([
+                'name' => $path,
+                'is_cover' => true,
+            ]);
 
-        $post = Post::create([
-            'user_id' => Auth::id(),
-            'is_published' => true,
-        ]);
+            $post->categories()->sync(
+                $this->collectAncestorIds($data['category_id'])
+            );
 
-        $post->images()->create([ // ✅
-            'name' => $path,
-            'is_cover' => true,
-        ]);
-
-        $post->categories()->sync(
-            $this->collectAncestorIds($data['category_id'])
-        );
-
-        $post->translations()->create([
-            'locale' => $data['locale'],
-            'title' => $data['title'],
-            'content' => $data['content'],
-        ]);
+            $post->translations()->create([
+                'locale' => $data['locale'],
+                'title' => $data['title'],
+                'content' => $data['content'],
+            ]);
+        });
 
         return to_route('post.index')->with('success', __('messages.post_created'));
     }
@@ -91,22 +90,24 @@ class PostController extends Controller
     public function storeImages(Request $request, Post $post)
     {
         $request->validate([
-            'images' => 'required|array', // ✅
+            'images' => 'required|array',
             'images.*' => 'required|image|max:2048',
             'cover_index' => 'nullable|integer',
         ]);
 
-        $files = $request->file('images'); // ✅
+        $files = $request->file('images');
         $coverIndex = $request->input('cover_index');
 
-        foreach ($files as $i => $file) {
-            $path = $this->images->store($file); // ✅
+        DB::transaction(function () use ($files, $coverIndex, $post) {
+            foreach ($files as $i => $file) {
+                $path = $this->images->store($file);
 
-            $post->images()->create([
-                'name' => $path,
-                'is_cover' => ($i == $coverIndex),
-            ]);
-        }
+                $post->images()->create([
+                    'name' => $path,
+                    'is_cover' => ($i == $coverIndex),
+                ]);
+            }
+        });
 
         return back()->with('success', 'Изображения загружены');
     }
@@ -115,40 +116,41 @@ class PostController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->hasFile('image_file')) {
-            $path = $this->images->store($request->file('image_file')); // ✅
+        DB::transaction(function () use ($request, $data, $post) {
+            if ($request->hasFile('image_file')) {
+                $path = $this->images->store($request->file('image_file'));
+                $post->images()->update(['is_cover' => false]);
+                $post->images()->create([
+                    'name' => $path,
+                    'is_cover' => true,
+                ]);
+            }
 
-            // сбрасываем старую обложку
-            $post->images()->update(['is_cover' => false]); // ✅
+            $post->categories()->sync(
+                $this->collectAncestorIds($data['category_id'])
+            );
 
-            $post->images()->create([ // ✅
-                'name' => $path,
-                'is_cover' => true,
-            ]);
-        }
-
-        $post->categories()->sync(
-            $this->collectAncestorIds($data['category_id'])
-        );
-
-        $post->translations()->updateOrCreate(
-            ['locale' => $request->input('locale')],
-            [
-                'title' => $request->input('title'),
-                'content' => $request->input('content'),
-            ]
-        );
+            $post->translations()->updateOrCreate(
+                ['locale' => $request->input('locale')],
+                [
+                    'title' => $request->input('title'),
+                    'content' => $request->input('content'),
+                ]
+            );
+        });
 
         return to_route('post.index')->with('success', __('messages.post_created'));
     }
 
     public function destroy(Post $post)
     {
-        foreach ($post->images as $image) {
-            if ($image->name && \Illuminate\Support\Facades\Storage::disk('public')->exists($image->name)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->name);
+        DB::transaction(function () use ($post) {
+            foreach ($post->images as $image) {
+                if ($image->name && \Illuminate\Support\Facades\Storage::disk('public')->exists($image->name)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($image->name);
+                }
             }
-        }
+        });
 
         $post->delete();
 
