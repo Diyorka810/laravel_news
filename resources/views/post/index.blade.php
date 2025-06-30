@@ -1,12 +1,12 @@
+@php use Illuminate\Support\Str; @endphp
+
 @extends('layouts.main')
 
 @section('content')
 <div class="row mt-3">
     <div class="col-md-4 col-sm-6">
         <form method="GET" action="{{ route('post.index') }}">
-            <select name="category"
-                    class="form-select"
-                    onchange="this.form.submit()">
+            <select name="category" class="form-select" onchange="this.form.submit()">
                 <option value="">{{ __('messages.choose_category') }}</option>
                 @foreach ($categories as $cat)
                     <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
@@ -22,25 +22,19 @@
     @foreach ($posts as $post)
         <div class="col-12 col-sm-6 col-md-4">
             <div class="post-card border p-2 h-100 d-flex flex-column justify-content-between">
-                <a href="{{ route('post.show', $post) }}"
-                   class="text-decoration-none text-dark d-block">
-
-                    <img src="{{ asset('storage/' . $post->coverImage->name) }}"
-                         class="card-img-top post-thumbnail"
-                         alt="{{ $post->coverImage->name }}">
-
+                <a href="{{ route('post.show', $post) }}" class="text-decoration-none text-dark d-block">
+                    <img src="{{ asset('storage/' . $post->coverImage->name) }}" class="card-img-top post-thumbnail" alt="{{ $post->coverImage->name }}">
                     <h2 class="h5">
-                        {{ \Illuminate\Support\Str::limit($post->translation()?->title ?? '—', 50) }}
+                        {{ Str::limit($post->translation()?->title ?? '—', 50) }}
                     </h2>
                     <p>
-                        {{ \Illuminate\Support\Str::limit($post->translation()?->content ?? '—', 140) }}
+                        {{ Str::limit($post->translation()?->content ?? '—', 140) }}
                     </p>
                 </a>
 
                 <div class="edit-btn-placeholder">
                     @if (auth()->check() && (auth()->id() === $post->user_id || auth()->user()->is_admin))
-                        <a href="{{ route('post.edit', $post) }}"
-                        class="btn btn-sm btn-outline-secondary edit-btn">
+                        <a href="{{ route('post.edit', $post) }}" class="btn btn-sm btn-outline-secondary edit-btn">
                             {{ __('messages.edit') }}
                         </a>
                     @endif

@@ -12,15 +12,13 @@
         </div>
     @endif
 
-    <form action="{{ route('post.update', $post->id) }}?lang={{ request('lang', app()->getLocale()) }}"
-            method="post" enctype="multipart/form-data">
+    <form action="{{ route('post.update', $post->id) }}?lang={{ request('lang', app()->getLocale()) }}" method="post" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
             <label for="locale" class="form-label">{{ __('messages.locale') }} <span class="text-danger">*</span></label>
-            <select name="locale" id="locale" class="form-select"
-                    onchange="location.href='{{ route('post.edit', $post->id) }}?lang=' + this.value;">
+            <select name="locale" id="locale" class="form-select" onchange="location.href='{{ route('post.edit', $post->id) }}?lang=' + this.value;">
                 @foreach (config('app.locales') as $code => $label)
                     <option value="{{ $code }}" {{ request('lang', app()->getLocale()) === $code ? 'selected' : '' }}>
                         {{ $label }}
@@ -47,12 +45,7 @@
 
         <div class="mb-3">
             <label for="title" class="form-label">{{ __('messages.title') }}</label>
-            <input type="text"
-                    name="title"
-                    class="form-control @error('title') is-invalid @enderror"
-                    id="title"
-                    value="{{ old('title', $translation?->title) }}"
-                    >
+            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" id="title" value="{{ old('title', $translation?->title) }}">
             @error('title')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -60,10 +53,9 @@
 
         <div class="mb-3">
             <label for="content" class="form-label">{{ __('messages.content') }}</label>
-            <textarea name="content"
-                    class="form-control @error('content') is-invalid @enderror"
-                    id="content"
-                    >{{ old('content', $translation?->content) }}</textarea>
+            <textarea name="content" class="form-control @error('content') is-invalid @enderror" id="content">
+                {{ old('content', $translation?->content) }}
+            </textarea>
             @error('content')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -71,11 +63,7 @@
 
         <div class="mb-3">
             <label for="image_file" class="form-label">{{ __('messages.image') }}</label>
-            <input type="file"
-                    name="image_file"
-                    class="form-control @error('image_file') is-invalid @enderror"
-                    id="image_file"
-                    accept="image/*">
+            <input type="file" name="image_file" class="form-control @error('image_file') is-invalid @enderror" id="image_file" accept="image/*">
             @error('image_file')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -125,42 +113,4 @@
     </form>
 
 </div>
-<script>
-    document.getElementById('images').addEventListener('change', function (e) {
-        const container = document.getElementById('imagePreviewContainer');
-        container.innerHTML = ''; // очистка
-
-        Array.from(e.target.files).forEach((file, index) => {
-            const reader = new FileReader();
-
-            reader.onload = function (event) {
-                const col = document.createElement('div');
-                col.classList.add('col-3', 'mb-3');
-
-                const img = document.createElement('img');
-                img.src = event.target.result;
-                img.classList.add('img-thumbnail');
-                img.style.width = '100%';
-
-                const radio = document.createElement('input');
-                radio.type = 'radio';
-                radio.name = 'cover_index';
-                radio.value = index;
-                radio.classList.add('form-check-input', 'mt-2');
-
-                const label = document.createElement('label');
-                label.textContent = 'Обложка';
-                label.classList.add('form-check-label', 'ms-1');
-
-                col.appendChild(img);
-                col.appendChild(radio);
-                col.appendChild(label);
-
-                container.appendChild(col);
-            };
-
-            reader.readAsDataURL(file);
-        });
-    });
-</script>
 @endsection
