@@ -9,7 +9,7 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Services\PostImageService;
 use App\Filters\PostFilter;
-
+use App\Models\PostImage;
 
 class PostController extends Controller{
 
@@ -17,7 +17,7 @@ class PostController extends Controller{
 
     public function index(Request $request)
     {
-        $query = Post::query()->with('translations');
+        $query = Post::query()->with('translations', 'coverImage');
 
         $posts = (new PostFilter($query, $request))
             ->apply()

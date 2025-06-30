@@ -25,9 +25,9 @@
                 <a href="{{ route('post.show', $post) }}"
                    class="text-decoration-none text-dark d-block">
 
-                    <img src="{{ asset('storage/' . $post->image_link) }}"
+                    <img src="{{ asset('storage/' . $post->coverImage->name) }}"
                          class="card-img-top post-thumbnail"
-                         alt="{{ $post->image_link }}">
+                         alt="{{ $post->coverImage->name }}">
 
                     <h2 class="h5">
                         {{ \Illuminate\Support\Str::limit($post->translation()?->title ?? '—', 50) }}
