@@ -39,4 +39,14 @@ class Post extends Model
     {
         return $this->belongsToMany(Category::class, 'post_categories');
     }
+
+    public function images()
+    {
+        return $this->hasMany(PostImage::class);
+    }
+
+    public function coverImage()
+    {
+        return $this->hasOne(PostImage::class)->where('is_cover', true);
+    }
 }

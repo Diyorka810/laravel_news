@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Kalnoy\Nestedset\NodeTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
