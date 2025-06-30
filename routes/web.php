@@ -18,6 +18,7 @@ Route::group(['prefix' => '/posts', 'as' => 'post.', 'middleware' => 'auth'], fu
     Route::get('/{post}/edit', [PostController::class, 'edit'])->name('edit');
     Route::put('/{post}', [PostController::class, 'update'])->name('update');
     Route::delete('/{post}', [PostController::class, 'destroy'])->middleware('is_admin')->name('destroy');
+    Route::post('/{post}/images', [PostController::class, 'storeImages'])->name('image.store');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

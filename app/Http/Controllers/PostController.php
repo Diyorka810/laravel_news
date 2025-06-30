@@ -10,9 +10,10 @@ use App\Models\Category;
 use App\Services\PostImageService;
 use App\Filters\PostFilter;
 use App\Models\PostImage;
+use Illuminate\Support\Facades\Storage;
 
-class PostController extends Controller{
-
+class PostController extends Controller
+{
     public function __construct(private PostImageService $images) {}
 
     public function index(Request $request)
@@ -40,13 +41,18 @@ class PostController extends Controller{
     {
         $data = $request->validated();
 
-        $path = $this->images->store($data['image_file']);
-        unset($data['image_file']);
+        $path = $this->images->store($request->file('image_file')); // ✅
+
+        unset($data['image_file']); // ✅
 
         $post = Post::create([
-            'user_id'     => Auth::id(),
-            'image_link'  => $path,
-            'is_published'=> true,
+            'user_id' => Auth::id(),
+            'is_published' => true,
+        ]);
+
+        $post->images()->create([ // ✅
+            'name' => $path,
+            'is_cover' => true,
         ]);
 
         $post->categories()->sync(
@@ -55,23 +61,54 @@ class PostController extends Controller{
 
         $post->translations()->create([
             'locale' => $data['locale'],
-            'title'    => $data['title'],
-            'content'  => $data['content'],
+            'title' => $data['title'],
+            'content' => $data['content'],
         ]);
 
         return to_route('post.index')->with('success', __('messages.post_created'));
     }
 
-    public function show(Post $post){
+    public function show(Post $post)
+    {
         $translation = $post->translation();
-        return view('post.show', compact('post', 'translation'));
+
+        $images = $post->images()
+            ->orderByDesc('is_cover')
+            ->orderBy('id')
+            ->get();
+
+        return view('post.show', compact('post', 'translation', 'images'));
     }
 
-    public function edit(Post $post){
+    public function edit(Post $post)
+    {
         $translation = $post->translation(request('lang'));
         $categories = Category::all();
 
         return view('post.edit', compact('post', 'translation', 'categories'));
+    }
+
+    public function storeImages(Request $request, Post $post)
+    {
+        $request->validate([
+            'images' => 'required|array', // ✅
+            'images.*' => 'required|image|max:2048',
+            'cover_index' => 'nullable|integer',
+        ]);
+
+        $files = $request->file('images'); // ✅
+        $coverIndex = $request->input('cover_index');
+
+        foreach ($files as $i => $file) {
+            $path = $this->images->store($file); // ✅
+
+            $post->images()->create([
+                'name' => $path,
+                'is_cover' => ($i == $coverIndex),
+            ]);
+        }
+
+        return back()->with('success', 'Изображения загружены');
     }
 
     public function update(UpdatePostRequest $request, Post $post)
@@ -79,10 +116,15 @@ class PostController extends Controller{
         $data = $request->validated();
 
         if ($request->hasFile('image_file')) {
-            $post->image_link = $this->images->replace(
-                $request->file('image_file'),
-                $post->image_link
-            );
+            $path = $this->images->store($request->file('image_file')); // ✅
+
+            // сбрасываем старую обложку
+            $post->images()->update(['is_cover' => false]); // ✅
+
+            $post->images()->create([ // ✅
+                'name' => $path,
+                'is_cover' => true,
+            ]);
         }
 
         $post->categories()->sync(
@@ -92,23 +134,27 @@ class PostController extends Controller{
         $post->translations()->updateOrCreate(
             ['locale' => $request->input('locale')],
             [
-                'title'   => $request->input('title'),
+                'title' => $request->input('title'),
                 'content' => $request->input('content'),
             ]
         );
-
-        $post->save();
 
         return to_route('post.index')->with('success', __('messages.post_created'));
     }
 
     public function destroy(Post $post)
     {
-        $this->images->delete($post->image_link);
+        foreach ($post->images as $image) {
+            if ($image->name && \Illuminate\Support\Facades\Storage::disk('public')->exists($image->name)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->name);
+            }
+        }
+
         $post->delete();
 
         return to_route('post.index')->with('success', 'Post deleted');
     }
+
 
     private function collectAncestorIds(int $categoryId): array
     {

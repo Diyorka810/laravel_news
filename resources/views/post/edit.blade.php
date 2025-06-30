@@ -103,5 +103,64 @@
             </button>
         </form>
     @endauth
+
+    <hr class="my-4">
+
+    <h4>Добавить изображения</h4>
+
+    <form action="{{ route('post.image.store', $post->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        <div class="mb-3">
+            <label for="images" class="form-label">Новые изображения</label>
+            <input type="file" name="images[]" id="images" class="form-control" accept="image/*" multiple>
+        </div>
+
+        <div class="mb-3">
+            <label for="cover_image" class="form-label">Выбери обложку</label>
+            <div id="imagePreviewContainer" class="row"></div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Загрузить</button>
+    </form>
+
 </div>
+<script>
+    document.getElementById('images').addEventListener('change', function (e) {
+        const container = document.getElementById('imagePreviewContainer');
+        container.innerHTML = ''; // очистка
+
+        Array.from(e.target.files).forEach((file, index) => {
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const col = document.createElement('div');
+                col.classList.add('col-3', 'mb-3');
+
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.classList.add('img-thumbnail');
+                img.style.width = '100%';
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'cover_index';
+                radio.value = index;
+                radio.classList.add('form-check-input', 'mt-2');
+
+                const label = document.createElement('label');
+                label.textContent = 'Обложка';
+                label.classList.add('form-check-label', 'ms-1');
+
+                col.appendChild(img);
+                col.appendChild(radio);
+                col.appendChild(label);
+
+                container.appendChild(col);
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+</script>
 @endsection
