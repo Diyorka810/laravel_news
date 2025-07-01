@@ -13,24 +13,43 @@ class PostService
 {
     public function __construct(private PostImageService $images) {}
 
-    public function createPost(array $data, $imageFile): void
+    public function createPost(array $data, array $imageFiles = [], ?string $mainImage = null): void
     {
-        $path = $this->images->store($imageFile);
-
-        DB::transaction(function () use ($data, $path) {
+        DB::transaction(function () use ($data, $imageFiles, $mainImage) {
             $post = Post::create([
                 'user_id' => Auth::id(),
                 'is_published' => true,
             ]);
 
-            $post->images()->create([
-                'name' => $path,
-                'is_cover' => true,
-            ]);
+            $newImageIds = [];
 
-            $post->categories()->sync(
-                $this->collectAncestorIds($data['category_id'])
-            );
+            foreach ($imageFiles as $file) {
+                $path = $this->images->store($file);
+                $image = $post->images()->create([
+                    'name' => $path,
+                    'is_cover' => false,
+                ]);
+                $newImageIds[] = $image->id;
+            }
+
+            if ($mainImage) {
+                if (str_starts_with($mainImage, 'new_')) {
+                    $index = (int) str_replace('new_', '', $mainImage);
+                    if (isset($newImageIds[$index])) {
+                        $post->images()->where('id', $newImageIds[$index])->update(['is_cover' => true]);
+                    }
+                }
+            } else {
+                if (!empty($newImageIds)) {
+                    $post->images()->where('id', $newImageIds[0])->update(['is_cover' => true]);
+                }
+            }
+
+            if (!empty($data['category_id'])) {
+                $post->categories()->sync(
+                    $this->collectAncestorIds($data['category_id'])
+                );
+            }
 
             $post->translations()->create([
                 'locale' => $data['locale'],

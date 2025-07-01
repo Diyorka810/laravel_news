@@ -36,7 +36,11 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
-        $this->posts->createPost($data, $request->file('image_file'));
+        $this->posts->createPost(
+            $data,
+            $request->file('image_file', []),
+            $request->input('main_image')
+        );
 
         return to_route('post.index')->with('success', __('messages.post_created'));
     }
