@@ -12,26 +12,15 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-#imagePreview {
-    max-width: 200px;
-    margin-top: 10px;
-    display: none;
-    cursor: pointer;
+.preview-img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 0.375rem; /* скругление как у .img-thumbnail */
+    border: 1px solid #dee2e6;
 }
-
-#imgOverlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1050;
-    background: rgba(0, 0, 0, .8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-}
-
-#imgOverlay img {
-    max-width: 90%;
-    max-height: 90%;
+.btn-close {
+    z-index: 10;
 }
 
 .post-card {

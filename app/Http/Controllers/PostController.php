@@ -118,18 +118,40 @@ class PostController extends Controller
         $data = $request->validated();
 
         DB::transaction(function () use ($request, $data, $post) {
+            $keepImageIds = $request->input('image_ids', []);
+            $post->images()->whereNotIn('id', $keepImageIds)->delete();
+
+            $newImageIds = [];
+
             if ($request->hasFile('image_file')) {
-                $path = $this->images->store($request->file('image_file'));
-                $post->images()->update(['is_cover' => false]);
-                $post->images()->create([
-                    'name' => $path,
-                    'is_cover' => true,
-                ]);
+                foreach ($request->file('image_file') as $file) {
+                    $path = $this->images->store($file);
+                    $image = $post->images()->create([
+                        'name' => $path,
+                        'is_cover' => false,
+                    ]);
+                    $newImageIds[] = $image->id;
+                }
             }
 
-            $post->categories()->sync(
-                $this->collectAncestorIds($data['category_id'])
-            );
+            $post->images()->update(['is_cover' => false]);
+
+            $main = $request->input('main_image');
+            if (str_starts_with($main, 'existing_')) {
+                $id = (int) str_replace('existing_', '', $main);
+                $post->images()->where('id', $id)->update(['is_cover' => true]);
+            } elseif (str_starts_with($main, 'new_')) {
+                $index = (int) str_replace('new_', '', $main);
+                if (isset($newImageIds[$index])) {
+                    $post->images()->where('id', $newImageIds[$index])->update(['is_cover' => true]);
+                }
+            }
+
+            if (!empty($data['category_id'])) {
+                $post->categories()->sync(
+                    $this->collectAncestorIds($data['category_id'])
+                );
+            }
 
             $post->translations()->updateOrCreate(
                 ['locale' => $request->input('locale')],
@@ -140,7 +162,7 @@ class PostController extends Controller
             );
         });
 
-        return to_route('post.index')->with('success', __('messages.post_created'));
+        return to_route('post.index')->with('success', __('messages.post_updated'));
     }
 
     public function destroy(Post $post)

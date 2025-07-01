@@ -23,7 +23,9 @@
         <div class="col-12 col-sm-6 col-md-4">
             <div class="post-card border p-2 h-100 d-flex flex-column justify-content-between">
                 <a href="{{ route('post.show', $post) }}" class="text-decoration-none text-dark d-block">
-                    <img src="{{ asset('storage/' . $post->coverImage->name) }}" class="card-img-top post-thumbnail" alt="{{ $post->coverImage->name }}">
+                    <img src="{{ asset('storage/' . ($post->coverImage?->name ?? 'placeholders/no-image.png')) }}"
+                        class="card-img-top post-thumbnail"
+                        alt="{{ $post->coverImage?->name ?? 'Нет изображения' }}">
                     <h2 class="h5">
                         {{ Str::limit($post->translation()?->title ?? '—', 50) }}
                     </h2>

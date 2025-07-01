@@ -63,19 +63,38 @@
 
         <div class="mb-3">
             <label for="image_file" class="form-label">{{ __('messages.image') }}</label>
-            <input type="file" name="image_file" class="form-control @error('image_file') is-invalid @enderror" id="image_file" accept="image/*">
+            <input
+                type="file"
+                name="image_file[]"
+                class="form-control @error('image_file') is-invalid @enderror"
+                id="image_file"
+                accept="image/*"
+                multiple
+            >
             @error('image_file')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
+        </div>
 
-            @if ($post->image_link)
-                <img id="imagePreview" src="" alt="">
-            @else
-                <img id="imagePreview" src="" alt="">
-            @endif
-
-            <div id="imgOverlay">
-                <img id="overlayImg">
+        <div class="mb-3">
+            <div id="all-images" class="d-flex gap-2 flex-wrap">
+                @foreach ($post->images ?? [] as $image)
+                    <div class="position-relative d-inline-block" data-existing-image-id="{{ $image->id }}">
+                        <input type="hidden" name="image_ids[]" value="{{ $image->id }}">
+                        <img src="{{ asset('storage/' . $image->name) }}" alt="image" class="preview-img">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 bg-white" aria-label="Удалить" onclick="removeExistingImage({{ $image->id }})"></button>
+                        <div class="form-check mt-1">
+                            <input
+                                class="form-check-input"
+                                type="radio"
+                                name="main_image"
+                                value="existing_{{ $image->id }}"
+                                id="main_existing_{{ $image->id }}"
+                                {{ $image->is_cover ? 'checked' : '' }}>
+                            <label class="form-check-label small" for="main_existing_{{ $image->id }}">Главная</label>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -91,26 +110,5 @@
             </button>
         </form>
     @endauth
-
-    <hr class="my-4">
-
-    <h4>Добавить изображения</h4>
-
-    <form action="{{ route('post.image.store', $post->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div class="mb-3">
-            <label for="images" class="form-label">Новые изображения</label>
-            <input type="file" name="images[]" id="images" class="form-control" accept="image/*" multiple>
-        </div>
-
-        <div class="mb-3">
-            <label for="cover_image" class="form-label">Выбери обложку</label>
-            <div id="imagePreviewContainer" class="row"></div>
-        </div>
-
-        <button type="submit" class="btn btn-success">Загрузить</button>
-    </form>
-
 </div>
 @endsection

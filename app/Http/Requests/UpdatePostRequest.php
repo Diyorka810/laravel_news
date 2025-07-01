@@ -16,9 +16,10 @@ class UpdatePostRequest extends FormRequest
         return [
             'locale' => ['required','string','size:2'],
             'title' => 'required|string',
-            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'content' => 'required|string',
             'image_link' => 'nullable|string',
+            'main_image' => ['nullable', 'string'],
         ];
     }
 }
