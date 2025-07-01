@@ -35,6 +35,7 @@ class PostFilter
         }
 
         return $this;
+        #test
     }
 
     protected function filterBySearch(): self
