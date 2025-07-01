@@ -4,6 +4,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Http\Request;
+use App\Filters\PostFilter;
 
 
 class Post extends Model
@@ -48,5 +50,14 @@ class Post extends Model
     public function coverImage()
     {
         return $this->hasOne(PostImage::class)->where('is_cover', true);
+    }
+
+    public static function filtered(Request $request)
+    {
+        $query = static::query()->with('translations', 'coverImage');
+
+        return (new PostFilter($query, $request))
+            ->apply()
+            ->latest('id');
     }
 }

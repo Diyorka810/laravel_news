@@ -58,15 +58,19 @@
         </div>
 
         <div class="mb-3">
-            <label for="image_file" class="form-label">{{ __('messages.image') }}</label>
-            <input type="file" name="image_file" id="image_file" class="form-control @error('image_file') is-invalid @enderror" accept="image/*" value="{{ old('image_file') }}">
-            @error('image_file')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-            <img id="imagePreview" src="" alt="">
-            <div id="imgOverlay">
-                <img id="overlayImg">
-            </div>
+            <input
+                type="file"
+                name="image_file[]"
+                id="image_file"
+                class="form-control @error('image_file') is-invalid @enderror"
+                accept="image/*"
+                multiple
+            >
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Предпросмотр изображений</label>
+            <div id="all-images" class="d-flex gap-2 flex-wrap"></div>
         </div>
 
         <button type="submit" class="btn btn-primary">{{ __('messages.create_button') }}</button>
