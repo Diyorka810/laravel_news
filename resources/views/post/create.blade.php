@@ -43,13 +43,7 @@
 
         <div class="mb-3">
             <label for="title" class="form-label">{{ __('messages.title') }}</label>
-            <input type="text"
-                   name="title"
-                   id="title"
-                   class="form-control @error('title') is-invalid @enderror"
-                   placeholder="{{ __('messages.title') }}"
-                   value="{{ old('title') }}"
-                   >
+            <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" placeholder="{{ __('messages.title') }}" value="{{ old('title') }}">
             @error('title')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -57,12 +51,7 @@
 
         <div class="mb-3">
             <label for="content" class="form-label">{{ __('messages.content') }}</label>
-            <textarea name="content"
-                      id="content"
-                      class="form-control @error('content') is-invalid @enderror"
-                      placeholder="{{ __('messages.content') }}"
-                      value="{{ old('content') }}"
-                      ></textarea>
+            <textarea name="content" id="content" class="form-control @error('content') is-invalid @enderror" placeholder="{{ __('messages.content') }}" value="{{ old('content') }}"></textarea>
             @error('content')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
@@ -70,13 +59,7 @@
 
         <div class="mb-3">
             <label for="image_file" class="form-label">{{ __('messages.image') }}</label>
-            <input type="file"
-                   name="image_file"
-                   id="image_file"
-                   class="form-control @error('image_file') is-invalid @enderror"
-                   accept="image/*"
-                   value="{{ old('image_file') }}"
-                   >
+            <input type="file" name="image_file" id="image_file" class="form-control @error('image_file') is-invalid @enderror" accept="image/*" value="{{ old('image_file') }}">
             @error('image_file')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror

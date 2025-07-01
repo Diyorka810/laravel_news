@@ -9,10 +9,11 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Services\PostImageService;
 use App\Filters\PostFilter;
-use App\Models\PostImage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
-class PostController extends Controller{
-
+class PostController extends Controller
+{
     public function __construct(private PostImageService $images) {}
 
     public function index(Request $request)
@@ -39,76 +40,146 @@ class PostController extends Controller{
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
-
-        $path = $this->images->store($data['image_file']);
+        $path = $this->images->store($request->file('image_file'));
         unset($data['image_file']);
 
-        $post = Post::create([
-            'user_id'     => Auth::id(),
-            'image_link'  => $path,
-            'is_published'=> true,
-        ]);
+        DB::transaction(function () use ($data, $path) {
+            $post = Post::create([
+                'user_id' => Auth::id(),
+                'is_published' => true,
+            ]);
 
-        $post->categories()->sync(
-            $this->collectAncestorIds($data['category_id'])
-        );
+            $post->images()->create([
+                'name' => $path,
+                'is_cover' => true,
+            ]);
 
-        $post->translations()->create([
-            'locale' => $data['locale'],
-            'title'    => $data['title'],
-            'content'  => $data['content'],
-        ]);
+            $post->categories()->sync(
+                $this->collectAncestorIds($data['category_id'])
+            );
+
+            $post->translations()->create([
+                'locale' => $data['locale'],
+                'title' => $data['title'],
+                'content' => $data['content'],
+            ]);
+        });
 
         return to_route('post.index')->with('success', __('messages.post_created'));
     }
 
-    public function show(Post $post){
+    public function show(Post $post)
+    {
         $translation = $post->translation();
-        return view('post.show', compact('post', 'translation'));
+
+        $images = $post->images()
+            ->orderByDesc('is_cover')
+            ->orderBy('id')
+            ->get();
+
+        return view('post.show', compact('post', 'translation', 'images'));
     }
 
-    public function edit(Post $post){
+    public function edit(Post $post)
+    {
         $translation = $post->translation(request('lang'));
         $categories = Category::all();
 
         return view('post.edit', compact('post', 'translation', 'categories'));
     }
 
+    public function storeImages(Request $request, Post $post)
+    {
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'required|image|max:2048',
+            'cover_index' => 'nullable|integer',
+        ]);
+
+        $files = $request->file('images');
+        $coverIndex = $request->input('cover_index');
+
+        DB::transaction(function () use ($files, $coverIndex, $post) {
+            foreach ($files as $i => $file) {
+                $path = $this->images->store($file);
+
+                $post->images()->create([
+                    'name' => $path,
+                    'is_cover' => ($i == $coverIndex),
+                ]);
+            }
+        });
+
+        return back()->with('success', 'Изображения загружены');
+    }
+
     public function update(UpdatePostRequest $request, Post $post)
     {
         $data = $request->validated();
 
-        if ($request->hasFile('image_file')) {
-            $post->image_link = $this->images->replace(
-                $request->file('image_file'),
-                $post->image_link
+        DB::transaction(function () use ($request, $data, $post) {
+            $keepImageIds = $request->input('image_ids', []);
+            $post->images()->whereNotIn('id', $keepImageIds)->delete();
+
+            $newImageIds = [];
+
+            if ($request->hasFile('image_file')) {
+                foreach ($request->file('image_file') as $file) {
+                    $path = $this->images->store($file);
+                    $image = $post->images()->create([
+                        'name' => $path,
+                        'is_cover' => false,
+                    ]);
+                    $newImageIds[] = $image->id;
+                }
+            }
+
+            $post->images()->update(['is_cover' => false]);
+
+            $main = $request->input('main_image');
+            if (str_starts_with($main, 'existing_')) {
+                $id = (int) str_replace('existing_', '', $main);
+                $post->images()->where('id', $id)->update(['is_cover' => true]);
+            } elseif (str_starts_with($main, 'new_')) {
+                $index = (int) str_replace('new_', '', $main);
+                if (isset($newImageIds[$index])) {
+                    $post->images()->where('id', $newImageIds[$index])->update(['is_cover' => true]);
+                }
+            }
+
+            if (!empty($data['category_id'])) {
+                $post->categories()->sync(
+                    $this->collectAncestorIds($data['category_id'])
+                );
+            }
+
+            $post->translations()->updateOrCreate(
+                ['locale' => $request->input('locale')],
+                [
+                    'title' => $request->input('title'),
+                    'content' => $request->input('content'),
+                ]
             );
-        }
+        });
 
-        $post->categories()->sync(
-            $this->collectAncestorIds($data['category_id'])
-        );
-
-        $post->translations()->updateOrCreate(
-            ['locale' => $request->input('locale')],
-            [
-                'title'   => $request->input('title'),
-                'content' => $request->input('content'),
-            ]
-        );
-
-        $post->save();
-
-        return to_route('post.index')->with('success', __('messages.post_created'));
+        return to_route('post.index')->with('success', __('messages.post_updated'));
     }
 
     public function destroy(Post $post)
     {
-        $this->images->delete($post->image_link);
+        DB::transaction(function () use ($post) {
+            foreach ($post->images as $image) {
+                if ($image->name && Storage::disk('public')->exists($image->name)) {
+                    Storage::disk('public')->delete($image->name);
+                }
+            }
+        });
+
         $post->delete();
 
         return to_route('post.index')->with('success', 'Post deleted');
     }
+
 
     private function collectAncestorIds(int $categoryId): array
     {

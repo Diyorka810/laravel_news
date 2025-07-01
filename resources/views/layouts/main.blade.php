@@ -19,11 +19,7 @@
                 <ul class="navbar-nav ms-auto">
                     <li>
                         <form method="GET" action="{{ route('post.index') }}" class="d-flex me-2" role="search">
-                            <input type="search"
-                                name="q"
-                                value="{{ request('q') }}"
-                                class="form-control form-control-sm"
-                                placeholder="{{ __('messages.search_placeholder') }}">
+                            <input type="search" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="{{ __('messages.search_placeholder') }}">
                         </form>
                     </li>
 
