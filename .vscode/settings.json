@@ -1,0 +1,9 @@
+{
+  "files.associations": {
+    "*.blade.php": "blade"
+  },
+  "blade.format.enable": true,
+  "blade.format.indentInnerHtml": true,
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false
+}
