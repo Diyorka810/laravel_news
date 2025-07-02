@@ -22,15 +22,9 @@ class UserController extends Controller
     public function register(RegisterUserRequest $request)
     {
         $data = $request->validated();
-        $result = $this->users->register($data);
+        $this->users->register($data);
 
-        if ($result['success']){
-            return redirect()->route('post.index');
-        }
-
-        return redirect()->back()
-            ->withErrors(['register' => $result['error']])
-            ->withInput();
+        return redirect()->route('post.index');
     }
 
     public function showLoginForm()

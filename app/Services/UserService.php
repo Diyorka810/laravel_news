@@ -10,19 +10,13 @@ class UserService
 {
     public function register(array $data)
     {
-        try {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-            ]);
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
 
-            Auth::login($user);
-
-            return ['success' => true, 'user' => $user];
-        } catch (\Throwable $e) {
-            return ['success' => false, 'error' => __('messages.register_failed')];
-        }
+        Auth::login($user);
     }
 
     public function login(array $data): array
