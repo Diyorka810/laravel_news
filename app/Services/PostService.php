@@ -104,20 +104,6 @@ class PostService
         });
     }
 
-    public function storeImages(Post $post, array $files, ?int $coverIndex): void
-    {
-        DB::transaction(function () use ($post, $files, $coverIndex) {
-            foreach ($files as $i => $file) {
-                $path = $this->images->store($file);
-
-                $post->images()->create([
-                    'name' => $path,
-                    'is_cover' => ($i === $coverIndex),
-                ]);
-            }
-        });
-    }
-
     public function deletePost(Post $post): void
     {
         DB::transaction(function () use ($post) {
