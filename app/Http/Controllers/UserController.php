@@ -7,9 +7,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Requests\LoginUserRequest;
+use App\Services\UserService;
 
 class UserController extends Controller
 {
+    public function __construct(private UserService $users) {}
+
+
     public function showRegisterForm()
     {
         return view('user.register');
@@ -18,17 +22,15 @@ class UserController extends Controller
     public function register(RegisterUserRequest $request)
     {
         $data = $request->validated();
-        $data['password'] = Hash::make($data['password']);
+        $result = $this->users->register($data);
 
-        try {
-            $user = User::create($data);
-            Auth::login($user);
+        if ($result['success']){
             return redirect()->route('post.index');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withErrors(['register' => __('messages.register_failed')])
-                ->withInput();
         }
+
+        return redirect()->back()
+            ->withErrors(['register' => $result['error']])
+            ->withInput();
     }
 
     public function showLoginForm()
@@ -39,16 +41,14 @@ class UserController extends Controller
     public function login(LoginUserRequest $request)
     {
         $data = $request->validated();
+        $result = $this->users->login($data);
 
-        $user = User::where('user_name', $data['user_name'])->first();
-
-        if ($user && Hash::check($data['password'], $user->password)) {
-            Auth::login($user);
+        if ($result['success']){
             return redirect()->route('post.index');
         }
-
+        
         return redirect()->back()
-            ->withErrors(['user_name' => __('messages.auth_failed')])
+            ->withErrors(['login' => __('messages.auth_failed')])
             ->withInput();
     }
 
