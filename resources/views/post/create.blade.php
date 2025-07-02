@@ -69,7 +69,6 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Предпросмотр изображений</label>
             <div id="all-images" class="d-flex gap-2 flex-wrap"></div>
         </div>
 
