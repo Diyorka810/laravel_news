@@ -55,9 +55,8 @@ class Post extends Model
     public static function filtered(Request $request)
     {
         $query = static::query()->with('translations', 'coverImage');
+        $filter = new PostFilter($query, $request);
 
-        return (new PostFilter($query, $request))
-            ->apply()
-            ->latest('id');
+        return $filter->apply()->latest('id');
     }
 }

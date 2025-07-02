@@ -19,7 +19,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $posts = Post::filtered($request)
-            ->paginate(6)
+            ->paginate(3)
             ->withQueryString();
 
         $categories = Category::with('translations')->get();

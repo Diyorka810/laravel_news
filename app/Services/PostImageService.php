@@ -15,7 +15,7 @@ class PostImageService
     public function store(UploadedFile $file): string
     {
         $filename = now()->format('Ymd_His') . '_' . Str::random(6) . '.' . $file->extension();
-
+        
         return $file->storeAs($this->folder, $filename, $this->disk);
     }
 

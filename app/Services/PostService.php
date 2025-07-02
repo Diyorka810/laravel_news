@@ -18,7 +18,6 @@ class PostService
         DB::transaction(function () use ($data, $imageFiles, $mainImage) {
             $post = Post::create([
                 'user_id' => Auth::id(),
-                'is_published' => true,
             ]);
 
             $newImageIds = $this->storeImages($post, $imageFiles);
